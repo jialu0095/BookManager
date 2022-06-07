@@ -1,0 +1,46 @@
+.bg {
+  position: fixed; // fix the bg still
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://gw.alipayobjects.com/zos/rmsportal/TVYTbAXWheQpRcWDaDMu.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center; // put the bg in the center( up-down and left-right)
+}
+
+.auth {
+  .title-info {
+    margin-top: 100px;
+    margin-bottom: 32px;
+    display: flex; // display the img and title in the same line
+    align-items: center; // vertical distribution
+    justify-content: center; // horizontal distribution
+
+    img {
+      // 60*60 img
+      width: 60px;
+      height: 60px;
+    }
+
+    h2 {
+      margin: 0; // other margins
+      margin-left: 18px; // left margin
+    }
+  }
+
+  .form {
+    width: 400px;
+    margin: 0 auto; // center
+
+    .item {
+      margin-bottom: 16px;
+      text-align: left; // text go to the left
+
+      button {
+        width: 100%; // take all the space
+      }
+    }
+  }
+}
