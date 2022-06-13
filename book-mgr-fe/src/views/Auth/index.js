@@ -5,6 +5,8 @@ import {
   ProfileOutlined,
 } from '@ant-design/icons-vue' // icons
 import { auth } from '@/service'
+import { result } from '@/helpers/utils'
+import { message } from 'ant-design-vue'
 
 export default defineComponent({
   // hook fn: will only be called when the component is initialized
@@ -13,19 +15,35 @@ export default defineComponent({
     const regForm = reactive({
       account: '',
       password: '',
+      inviteCode: '',
     })
     const loginForm = reactive({
       account: '',
       password: '',
     })
 
-    // fn that deal with click events
-    const register = () => {
+    // register logic
+    const register = async () => {
       // pass the data to back-end router
-      auth.register(regForm.account, regForm.password)
+      // get ctx.body from promise
+      const res = await auth.register(
+        regForm.account,
+        regForm.password,
+        regForm.inviteCode
+      )
+
+      result(res).success((data) => {
+        message.success(data.msg)
+      })
     }
-    const login = () => {
-      auth.login(regForm.account, regForm.password)
+
+    // login logic
+    const login = async () => {
+      const res = await auth.login(loginForm.account, loginForm.password)
+
+      result(res).success((data) => {
+        message.success(data.msg)
+      })
     }
 
     return {

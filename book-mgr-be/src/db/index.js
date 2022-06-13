@@ -1,6 +1,7 @@
 // import mongoose
 const mongoose = require('mongoose')
 require('./Schemas/User') // excute User.js to register 'User' model
+require('./Schemas/InviteCode')
 
 // const UserModal = mongoose.model('User', UserSchema)
 

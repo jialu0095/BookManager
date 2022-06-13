@@ -65,7 +65,11 @@
             </a-input>
           </div>
           <div class="item">
-            <a-input size="large" placeholder="Invite Code">
+            <a-input
+              v-model:value="regForm.inviteCode"
+              size="large"
+              placeholder="Invite Code"
+            >
               <template #prefix>
                 <profile-outlined />
               </template>
