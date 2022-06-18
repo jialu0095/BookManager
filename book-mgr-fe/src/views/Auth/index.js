@@ -15,7 +15,7 @@ export default defineComponent({
     const regForm = reactive({
       account: '',
       password: '',
-      inviteCode: '',
+      inviteCode__code: '',
     })
     const loginForm = reactive({
       account: '',
@@ -29,7 +29,7 @@ export default defineComponent({
       const res = await auth.register(
         regForm.account,
         regForm.password,
-        regForm.inviteCode
+        regForm.inviteCode_code
       )
 
       result(res).success((data) => {

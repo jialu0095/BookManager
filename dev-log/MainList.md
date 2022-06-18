@@ -209,3 +209,49 @@ It looks like this:
 
 
 
+## Book front-end
+
+
+
+'scoped' is to state that all scoped css will only be effective within this component. Otherwise the css will be used globally.
+
+
+
+
+
+### Create a new global component 
+
+Add new self-define component under ./component/Spacebetween
+
+```vue
+<template>
+  <div class="space-between">
+    <slot />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.space-between {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+
+<script src="./index.js"></script>
+```
+
+Register it a global component in ./main.js
+
+```js
+
+import { SpaceBetween } from '@/components/SpaceBetween'
+
+createApp(App)
+  .use(store)
+  .use(Antd)
+  .component('space-between', SpaceBetween)
+  .use(router)
+  .mount('#app')
+```
+
+Contents inside <space-between> will be put into <slot />

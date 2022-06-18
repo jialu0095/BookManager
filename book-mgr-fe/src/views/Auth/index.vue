@@ -66,7 +66,7 @@
           </div>
           <div class="item">
             <a-input
-              v-model:value="regForm.inviteCode"
+              v-model:value="regForm.inviteCode_code"
               size="large"
               placeholder="Invite Code"
             >

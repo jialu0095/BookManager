@@ -15,9 +15,9 @@ const router = new Router({
 // call the cb fn when /auth/register made a POST request
 router.post('/register', async (ctx) => {
   // get req data from post req
-  const { account, password, inviteCode } = getBody(ctx)
+  const { account, password, inviteCode_code } = getBody(ctx)
 
-  console.log(inviteCode)
+  console.log(inviteCode_code)
 
   // check account and password in the back-end to prevent invalid post
   // that are not send from the front-end
@@ -42,7 +42,7 @@ router.post('/register', async (ctx) => {
       data: null,
     }
     return
-  } else if (inviteCode === '') {
+  } else if (inviteCode_code === '') {
     ctx.body = {
       code: 0,
       msg: 'Invite code is empty!',
@@ -67,7 +67,7 @@ router.post('/register', async (ctx) => {
 
   // check if invite code is valid
   const findCode = await InviteCode.findOne({
-    code: inviteCode,
+    code: inviteCode_code,
   }).exec()
   // if invite code is invalid or is already occupied
   if (!findCode || findCode.user) {
@@ -120,7 +120,7 @@ router.post('/login', async (ctx) => {
     account,
   }).exec()
 
-  // account don't exist
+  // if account don't exist
   if (!findUser) {
     ctx.body = {
       code: 0,
