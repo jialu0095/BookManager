@@ -15,7 +15,7 @@ export default defineComponent({
     const regForm = reactive({
       account: '',
       password: '',
-      inviteCode__code: '',
+      inviteCode_code: '',
     })
     const loginForm = reactive({
       account: '',

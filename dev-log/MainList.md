@@ -220,6 +220,7 @@ Add new self-define component under ./component/Spacebetween
 ```vue
 <template>
   <div class="space-between">
+    <!-- slot is a placeholder for the elements in later calls -->
     <slot />
   </div>
 </template>
@@ -336,6 +337,16 @@ Use v-model to connect Book and AddOne:
 
 1. Define show to control popup's visible in Book
 
+   ref variable: [ref | Vue3 (vue3js.cn)](https://vue3js.cn/reactivity/ref.html)
+
+   ### Difference between ref  and reactive in Vue
+
+   Both reactive and ref are used to define responsive data. Reactive recommends defining complex data types. ref recommends defining primitive types
+
+   We can simply understand as ref is a secondary wrapper around reactive, and ref defines data access need using .value
+
+   Using refto define basic data types, REF can also define arrays and objects.
+
 ```js
     // add book popup
     const show = ref(false)
@@ -436,7 +447,7 @@ const columns = [
             {{ formatTsp(record.publishDate) }}
           </template>
         </template>
-      </a-table>
+    </a-table>
 ```
 
 ## Pagination
@@ -604,7 +615,7 @@ add keyword as parameters when calling book.list.
 ./views/Book.js
 
 ```js
-   const isSearch = ref(false) // if is searching by book name
+   const isSearch = ref(false) // if is searching by book name, show "return" btn
 
     // search by book name
     const keyword = ref('')
@@ -647,3 +658,251 @@ add keyword as parameters when calling book.list.
       </space-between>
 ```
 
+## Remove books
+
+Delete book by id from DB in the backend
+
+```js
+router.delete('/:id', async (ctx) => {
+  // get is from front-end
+  const { id } = ctx.params
+
+  // delete files in the DB
+  const delMsg = await Book.deleteOne({
+    _id: id,
+  })
+
+  ctx.body = {
+    data: delMsg,
+    msg: 'Delete successfully!',
+    code: 1,
+  }
+})
+```
+
+front-end post request
+
+```js
+// delete book
+export const remove = (id) => {
+  return axios.delete(`http://localhost:3000/book/${id}`)
+}
+```
+
+front-end event logic in ./View
+
+```js
+    // delete book
+    const remove = async (record) => {
+      const { _id } = record
+      const res = await book.remove(_id)
+
+      // result(res).success(({ msg }) => {
+      //   message.success(msg)
+      // })
+
+      // refresh book list
+      getList()
+    }
+```
+
+front-end UI slots
+
+```vue
+		 <template v-if="column.dataIndex === 'operation'">
+            <a href="javascript:;" @click="remove(record)">Delete</a>
+          </template>
+```
+
+## Adjust remain books
+
+Add a '+' and '-' around count as fast adjusting buttons (only +1 or -1). Add a 'batch edit'.
+
+Use a-modal as popup for batch edit, a-modal contains an a-input and a a-selection Ant UI component.
+
+Us flex '\<div\>' to arrange the layout of '+ count -' and 'batch edit'.
+
+```js
+<template v-if="column.dataIndex === 'count'">
+            <div class="count">
+              <div class="edit-1">
+                <a
+                  href="javascript:;"
+                  @click="minusOneBook(record)"
+                  style="font-size: x-large; font-weight: bold"
+                  >-</a
+                >
+                {{ record.count }}
+                <a
+                  href="javascript:;"
+                  @click="addOneBook(record)"
+                  style="font-size: 18px; font-weight: bold"
+                  >+</a
+                >
+              </div>
+              <div class="batch-edit">
+                <a href="javascript:;" @click="showModal()"> Batch Edit</a>
+                <a-modal
+                  v-model:visible="visible"
+                  title="Basic Modal"
+                  @ok="handleOk(record)"
+                >
+                  <div style="margin-bottom: 10px">
+                    <a-space>
+                      <a-select
+                        ref="select"
+                        v-model:value="editType"
+                        style="width: 120px"
+                        :options="options1"
+                        @focus="focus"
+                        @change="handleChange"
+                      ></a-select>
+                    </a-space>
+                  </div>
+                  <div>
+                    <a-input-number
+                      v-model:value="editCount"
+                      :min="0"
+                      :max="999"
+                    />
+                  </div>
+                </a-modal>
+              </div>
+            </div>
+          </template>
+```
+
+.js
+
+```js
+// just adjust remain books quatity by 1
+    const addOneBook = async (record) => {
+      const { _id, count } = record
+      const res = await book.updateCount({
+        id: _id,
+        count,
+        type: 1,
+        editCount: 1,
+      })
+
+      getList()
+    }
+    const minusOneBook = async (record) => {
+      const { _id, count } = record
+      const res = await book.updateCount({
+        id: _id,
+        count,
+        type: 2,
+        editCount: 1,
+      })
+
+      getList()
+    }
+
+    // adjust batch book remain quatity
+    const visible = ref(false)
+    const editCount = ref(0)
+    const editType = ref('Add') // Add or Minus
+
+    const showModal = () => {
+      visible.value = true
+    }
+
+    // Excute when modal ok is clicked
+    const handleOk = async (record) => {
+      // type is referred as number in the backend
+      let type = 1
+      if (editType.value === 'Add') {
+        type = 1
+      }
+      if (editType.value === 'Minus') {
+        type = 2
+      }
+
+      const { _id, count } = record
+      const res = await book.updateCount({
+        id: _id,
+        count,
+        type: type,
+        editCount: editCount.value,
+      })
+      editCount.value = 0
+      editType.value = 'Add'
+      getList()
+      visible.value = false
+    }
+
+    // type selection for modal a-selection
+    const options1 = reactive([
+      {
+        value: 'Add',
+        label: 'Add',
+      },
+      {
+        value: 'Minus',
+        label: 'Minus',
+      },
+    ])
+
+    const focus = () => {
+      // execute when clicked
+    }
+
+    // execute when a-selection changed
+    const handleChange = (value) => {
+      if (value === 'Minus') {
+        editType.value = 'Minus'
+      } else {
+        editType.value = 'Add'
+      }
+    }
+```
+
+backend:
+
+router... js
+
+```js
+router.post('/update/count', async (ctx) => {
+  // type: in or out book
+  const { id, count, type, editCount } = ctx.request.body
+  const book = await Book.findOne({
+    _id: id,
+  }).exec()
+  if (!book) {
+    ctx.body = {
+      code: 0,
+      msg: 'No book found.',
+    }
+    return
+  }
+  // add one book
+  if (type === BOOK_CONST.ADD) { // const ADD === 1
+    book.count = book.count + editCount
+  }
+  // minus one book
+  else {
+    book.count = book.count - editCount
+  }
+  // check for lower bound of book count
+  if (book.count < 0) {
+    book.count = 0
+  }
+  // tell mongoose to save to mongo
+  const res = await book.save()
+  // response context
+  ctx.body = {
+    code: 1,
+    msg: 'complete.',
+    data: res,
+  }
+})
+```
+
+
+
+## Edit book's detail info
+
+
+
+extended operators/remain params '...'

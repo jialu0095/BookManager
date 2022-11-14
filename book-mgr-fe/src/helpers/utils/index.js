@@ -29,3 +29,23 @@ export const result = (res, authShowErr = true) => {
     },
   }
 }
+
+// clone an obj
+export const clone = (obj) => {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+// transfer timestp to date
+export const formatTsp = (tsp) => {
+  const date = new Date(Number(tsp))
+
+  const YYYY = date.getFullYear()
+  const MM = date.getMonth() + 1
+  const DD = date.getDate()
+
+  // const hh = tspPadStart(date.getHours())
+  // const mm = tspPadStart(date.getMinutes())
+  // const ss = tspPadStart(date.getSeconds())
+
+  return `${YYYY}-${MM}-${DD}`
+}
